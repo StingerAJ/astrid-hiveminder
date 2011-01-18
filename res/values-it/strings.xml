@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- See the file "LICENSE" for the full license governing this code. -->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- application name -->
+    <string name="app_name">Astrid Hiveminder Plugin</string>
+
+    <!-- ====================== Plugin Boilerplate ========================= -->
+
+    <!-- label for hive button in Task Edit Activity -->
+    <string name="hive_EOE_button">Ricorda le impostazioni di Hiveminder</string>
+    
+    <!-- task detail showing Hiveminder repeat information -->
+    <string name="hive_TLA_repeat">Ripetizione Attività Hiveminder</string>
+    
+    <!--  task detail showing item needs to be synchronized -->
+    <string name="hive_TLA_sync">Necessita la sincronizzazione con Hiveminder</string>
+
+    <!-- filters header: Hiveminder -->
+    <string name="hive_FEx_header">Ricorda Hiveminder</string>
+    
+    <!-- filter category for Hiveminder lists -->
+    <string name="hive_FEx_list">Liste</string>
+    
+    <!--  Hiveminder list filter title (%s => list) -->
+    <string name="hive_FEx_list_title">LIsta Hiveminder \'%s\'</string>
+    
+    <!-- ======================= HiveEditActivity ========================== -->
+    
+    <!--  Hiveminder edit activity Title -->
+    <string name="hive_MEA_title">Ricorda Hiveminder</string>
+    
+    <!--  Hiveminder edit List Edit Label -->
+    <string name="hive_MEA_list_label">Lista Hiveminder:</string>
+    
+    <!--  Hiveminder edit Repeat Label -->
+    <string name="hive_MEA_repeat_label">Stato di ripetizione Hiveminder:</string>
+    
+    <!--  Hiveminder edit Repeat Hint -->
+    <string name="hive_MEA_repeat_hint">in altre parole ogni settimana, dopo 14 giorni</string>
+    
+    <!-- ======================== HivePreferences ========================== -->
+
+    <!-- Hive Preferences Title -->    
+    <string name="hive_MPr_header">Ricorda Hiveminder</string>
+    
+    <!-- ======================= HiveLoginActivity ========================= -->
+
+    <!-- Hiveminder Login Instructions -->
+    <string name="hive_MLA_label">Per favore esegui l\'accesso e autorizza Astrid:</string>
+
+    <!-- Login Error Dialog (%s => message) -->
+    <string name="hive_MLA_error">Spiacenti,si è verificato un errore durante la verifica di accesso. Prova di nuovo. \n\n Messaggio di Errore: %s</string>
+    
+    <!-- ======================== Synchronization ========================== -->    
+    
+    <!-- title for notification tray when synchronizing -->
+    <string name="hive_notification_title">Astrid: Ricorda il Hiveminder</string>
+    
+    <!-- Error msg when io exception with hive -->
+    <string name="hive_ioerror">Errore di connessione! Verificare la connessione Internet, o magari i server Hiveminder (www.hiveminder.com), per le possibili soluzioni.</string>
+            
+
+
+</resources>
