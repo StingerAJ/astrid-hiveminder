@@ -347,6 +347,9 @@ public class ServiceImpl
     if (listId != null)
     {
       params.add(new Param("list_id", listId));
+    } else {
+        // Default "To Do" Smartlist
+        params.add(new Param("list_id", "1"));
     }
     if (filter != null)
     {

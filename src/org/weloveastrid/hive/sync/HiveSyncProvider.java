@@ -21,7 +21,6 @@ import org.weloveastrid.hive.api.ApplicationInfo;
 import org.weloveastrid.hive.api.ServiceImpl;
 import org.weloveastrid.hive.api.ServiceInternalException;
 import org.weloveastrid.hive.api.data.HiveAuth.Perms;
-import org.weloveastrid.hive.api.data.HiveList;
 import org.weloveastrid.hive.api.data.HiveLists;
 import org.weloveastrid.hive.api.data.HiveTask;
 import org.weloveastrid.hive.api.data.HiveTask.Priority;
@@ -265,36 +264,37 @@ public class HiveSyncProvider extends SyncProvider<HiveTaskContainer> {
             ArrayList<HiveTaskContainer> remoteChanges = new ArrayList<HiveTaskContainer>();
             Date lastSyncDate = new Date(HiveUtilities.INSTANCE.getLastSyncDate());
             boolean shouldSyncIndividualLists = false;
-            String filter = null;
             if(lastSyncDate.getTime() == 0)
-                filter = "status:incomplete"; //$NON-NLS-1$ // 1st time sync: get unfinished tasks
+                lastSyncDate = null; // get all unfinished tasks
 
             // try the quick synchronization
             try {
                 Thread.sleep(1000); // throttle
-                HiveTasks tasks = hiveService.tasks_getList(null, filter, lastSyncDate);
+                HiveTasks tasks = hiveService.tasks_getList(null, null, lastSyncDate);
                 addTasksToList(tasks, remoteChanges);
             } catch (Exception e) {
-                handleException("hive-quick-sync", e, false); //$NON-NLS-1$
-                remoteChanges.clear();
-                shouldSyncIndividualLists = true;
+//                handleException("hive-quick-sync", e, false); //$NON-NLS-1$
+                handleException("hive-quick-sync", e, true); //$NON-NLS-1$
+//                remoteChanges.clear();
+//                shouldSyncIndividualLists = true;
+                return;
             }
 
-            if(shouldSyncIndividualLists) {
-                for(HiveList list : lists.getLists().values()) {
-                    if(list.isSmart())
-                        continue;
-                    try {
-                        Thread.sleep(1500);
-                        HiveTasks tasks = hiveService.tasks_getList(list.getId(),
-                                filter, lastSyncDate);
-                        addTasksToList(tasks, remoteChanges);
-                    } catch (Exception e) {
-                        handleException("hive-indiv-sync", e, true); //$NON-NLS-1$
-                        continue;
-                    }
-                }
-            }
+//            if(shouldSyncIndividualLists) {
+//                for(HiveList list : lists.getLists().values()) {
+//                    if(list.isSmart())
+//                        continue;
+//                    try {
+//                        Thread.sleep(1500);
+//                        HiveTasks tasks = hiveService.tasks_getList(list.getId(),
+//                                null, lastSyncDate);
+//                        addTasksToList(tasks, remoteChanges);
+//                    } catch (Exception e) {
+//                        handleException("hive-indiv-sync", e, true); //$NON-NLS-1$
+//                        continue;
+//                    }
+//                }
+//            }
 
             SyncData<HiveTaskContainer> syncData = populateSyncData(remoteChanges);
             try {
