@@ -63,4 +63,9 @@ public class HiveUtilities extends SyncProviderUtilities {
         return R.string.hive_MPr_interval_key;
     }
 
+    @Override
+    public String getLoggedInUserName() {
+        return "";
+    }
+
 }

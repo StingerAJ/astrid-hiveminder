@@ -38,7 +38,7 @@ public class HiveBackgroundService extends Service {
             if(intent != null && SYNC_ACTION.equals(intent.getAction()))
                 startSynchronization(this);
         } catch (Exception e) {
-            HiveUtilities.INSTANCE.setLastError(e.toString());
+            HiveUtilities.INSTANCE.setLastError(e.toString(), "");
         }
     }
 

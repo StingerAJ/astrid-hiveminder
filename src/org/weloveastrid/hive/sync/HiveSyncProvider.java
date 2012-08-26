@@ -35,7 +35,6 @@ import org.weloveastrid.hive.data.HiveNoteFields;
 import android.app.Activity;
 import android.app.Notification;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -55,6 +54,7 @@ import com.todoroo.astrid.api.AstridApiConstants;
 import com.todoroo.astrid.data.Metadata;
 import com.todoroo.astrid.data.Task;
 import com.todoroo.astrid.sync.SyncProvider;
+import com.todoroo.astrid.sync.SyncProviderUtilities;
 
 public class HiveSyncProvider extends SyncProvider<HiveTaskContainer> {
 
@@ -99,7 +99,7 @@ public class HiveSyncProvider extends SyncProvider<HiveTaskContainer> {
     @Override
     protected void handleException(String tag, Exception e, boolean showError) {
         final Context context = ContextManager.getContext();
-        HiveUtilities.INSTANCE.setLastError(e.toString());
+        HiveUtilities.INSTANCE.setLastError(e.toString(), "");
 
         String message = null;
 
@@ -154,7 +154,7 @@ public class HiveSyncProvider extends SyncProvider<HiveTaskContainer> {
      */
     @Override
     @SuppressWarnings("nls")
-    protected void initiateBackground(Service service) {
+    protected void initiateBackground() {
         DependencyInjectionService.getInstance().inject(this);
 
         try {
@@ -409,9 +409,10 @@ public class HiveSyncProvider extends SyncProvider<HiveTaskContainer> {
      * Send changes for the given Task across the wire. If a remoteTask is
      * supplied, we attempt to intelligently only transmit the values that
      * have changed.
+     * @return
      */
     @Override
-    protected void push(HiveTaskContainer local, HiveTaskContainer remote) throws IOException {
+    protected HiveTaskContainer push(HiveTaskContainer local, HiveTaskContainer remote) throws IOException {
         boolean remerge = false;
 
         String listId = Long.toString(local.listId);
@@ -509,6 +510,8 @@ public class HiveSyncProvider extends SyncProvider<HiveTaskContainer> {
             local.repeating = remote.repeating;
             local.taskSeriesId = remote.taskSeriesId;
         }
+
+        return remote;
     }
 
     /** Create a task container for the given HiveTaskSeries */
@@ -629,4 +632,8 @@ public class HiveSyncProvider extends SyncProvider<HiveTaskContainer> {
         stripslashes(____+1,__.substring(1),___+((char)_)));
     }
 
+    @Override
+    protected SyncProviderUtilities getUtilities() {
+        return HiveUtilities.INSTANCE;
+    }
 }

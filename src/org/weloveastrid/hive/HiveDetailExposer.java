@@ -52,53 +52,47 @@ public class HiveDetailExposer extends BroadcastReceiver {
         if(taskId == -1)
             return;
 
-        boolean extended = intent.getBooleanExtra(AstridApiConstants.EXTRAS_EXTENDED, false);
-        String taskDetail = getTaskDetails(context, taskId, extended);
+        String taskDetail = getTaskDetails(context, taskId);
         if(taskDetail == null)
             return;
 
         Intent broadcastIntent = new Intent(AstridApiConstants.BROADCAST_SEND_DETAILS);
         broadcastIntent.putExtra(AstridApiConstants.EXTRAS_ADDON, HiveUtilities.IDENTIFIER);
         broadcastIntent.putExtra(AstridApiConstants.EXTRAS_TASK_ID, taskId);
-        broadcastIntent.putExtra(AstridApiConstants.EXTRAS_EXTENDED, extended);
         broadcastIntent.putExtra(AstridApiConstants.EXTRAS_RESPONSE, taskDetail);
         context.sendBroadcast(broadcastIntent, AstridApiConstants.PERMISSION_READ);
     }
 
-    public String getTaskDetails(Context context, long id, boolean extended) {
+    public String getTaskDetails(Context context, long id) {
         Metadata metadata = hiveMetadataService.getTaskMetadata(id);
         if(metadata == null)
             return null;
 
         StringBuilder builder = new StringBuilder();
 
-        if(!extended) {
-            long listId = metadata.getValue(HiveTaskFields.LIST_ID);
-            String listName = hiveListService.getListName(listId);
-            // Hiveminder list is out of date. don't display Hiveminder stuff
-            if(listName == null)
-                return null;
+        long listId = metadata.getValue(HiveTaskFields.LIST_ID);
+        String listName = hiveListService.getListName(listId);
+        // Hiveminder list is out of date. don't display Hiveminder stuff
+        if(listName == null)
+            return null;
 
-            if(listId > 0 && !"Inbox".equals(listName)) { //$NON-NLS-1$
-                builder.append("<img src='silk_folder'/> ").append(listName).append(DETAIL_SEPARATOR); //$NON-NLS-1$
-            }
-
-            int repeat = metadata.getValue(HiveTaskFields.REPEATING);
-            if(repeat != 0) {
-                builder.append(context.getString(R.string.hive_TLA_repeat)).append(DETAIL_SEPARATOR);
-            }
+        if(listId > 0 && !"Inbox".equals(listName)) { //$NON-NLS-1$
+            builder.append("<img src='silk_folder'/> ").append(listName).append(DETAIL_SEPARATOR); //$NON-NLS-1$
         }
 
-        if(extended) {
-            TodorooCursor<Metadata> notesCursor = hiveMetadataService.getTaskNotesCursor(id);
-            try {
-                for(notesCursor.moveToFirst(); !notesCursor.isAfterLast(); notesCursor.moveToNext()) {
-                    metadata.readFromCursor(notesCursor);
-                    builder.append(HiveNoteFields.toTaskDetail(metadata)).append(DETAIL_SEPARATOR);
-                }
-            } finally {
-                notesCursor.close();
+        int repeat = metadata.getValue(HiveTaskFields.REPEATING);
+        if(repeat != 0) {
+            builder.append(context.getString(R.string.hive_TLA_repeat)).append(DETAIL_SEPARATOR);
+        }
+
+        TodorooCursor<Metadata> notesCursor = hiveMetadataService.getTaskNotesCursor(id);
+        try {
+            for(notesCursor.moveToFirst(); !notesCursor.isAfterLast(); notesCursor.moveToNext()) {
+                metadata.readFromCursor(notesCursor);
+                builder.append(HiveNoteFields.toTaskDetail(metadata)).append(DETAIL_SEPARATOR);
             }
+        } finally {
+            notesCursor.close();
         }
 
         if(builder.length() == 0)
