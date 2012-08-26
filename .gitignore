@@ -2,6 +2,7 @@
 .metadata
 *.class
 org.eclipse.ltk.core.refactoring.prefs
+bin
 gen
 local.properties
 ecbuild

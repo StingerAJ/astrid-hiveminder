@@ -19,6 +19,7 @@ import com.todoroo.andlib.sql.Criterion;
 import com.todoroo.andlib.sql.Join;
 import com.todoroo.andlib.sql.QueryTemplate;
 import com.todoroo.astrid.api.AstridApiConstants;
+import com.todoroo.astrid.api.AstridFilterExposer;
 import com.todoroo.astrid.api.Filter;
 import com.todoroo.astrid.api.FilterCategory;
 import com.todoroo.astrid.api.FilterListHeader;
@@ -35,7 +36,7 @@ import com.todoroo.astrid.data.TaskApiDao.TaskCriteria;
  * @author Tim Su <tim@todoroo.com>
  *
  */
-public class HiveFilterExposer extends BroadcastReceiver {
+public class HiveFilterExposer extends BroadcastReceiver implements AstridFilterExposer {
 
     @Autowired private HiveListService hiveListService;
 
@@ -67,9 +68,17 @@ public class HiveFilterExposer extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         ContextManager.setContext(context);
 
+        FilterListItem[] list = prepareFilters(context);
+        Intent broadcastIntent = new Intent(AstridApiConstants.BROADCAST_SEND_FILTERS);
+        broadcastIntent.putExtra(AstridApiConstants.EXTRAS_ADDON, HiveUtilities.IDENTIFIER);
+        broadcastIntent.putExtra(AstridApiConstants.EXTRAS_RESPONSE, list);
+        context.sendBroadcast(broadcastIntent, AstridApiConstants.PERMISSION_READ);
+    }
+
+    private FilterListItem[] prepareFilters(Context context) {
         // if we aren't logged in, don't expose features
         if(!HiveUtilities.INSTANCE.isLoggedIn())
-            return;
+            return null;
 
         DependencyInjectionService.getInstance().inject(this);
 
@@ -77,7 +86,7 @@ public class HiveFilterExposer extends BroadcastReceiver {
 
         // If user does not have any tags, don't show this section at all
         if(lists.length == 0)
-            return;
+            return null;
 
         Filter[] listFilters = new Filter[lists.length];
         for(int i = 0; i < lists.length; i++)
@@ -91,10 +100,15 @@ public class HiveFilterExposer extends BroadcastReceiver {
         FilterListItem[] list = new FilterListItem[2];
         list[0] = hiveHeader;
         list[1] = hiveLists;
-        Intent broadcastIntent = new Intent(AstridApiConstants.BROADCAST_SEND_FILTERS);
-        broadcastIntent.putExtra(AstridApiConstants.EXTRAS_ADDON, HiveUtilities.IDENTIFIER);
-        broadcastIntent.putExtra(AstridApiConstants.EXTRAS_RESPONSE, list);
-        context.sendBroadcast(broadcastIntent, AstridApiConstants.PERMISSION_READ);
+        return list;
+    }
+
+    @Override
+    public FilterListItem[] getFilters() {
+        if (ContextManager.getContext() == null)
+            return null;
+
+        return prepareFilters(ContextManager.getContext());
     }
 
 }
